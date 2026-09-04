@@ -2365,18 +2365,65 @@ function deleteAlert(i) {
 }
 
 function checkAlerts() {
+  const notifOk = ('Notification' in window) && Notification.permission === 'granted';
+
+  // ── Manual custom alerts (from the 🔔 Alerts modal) ──
   const alerts = getAlerts();
-  if (!alerts.length || !('Notification' in window) || Notification.permission !== 'granted') return;
-  for (const a of alerts) {
-    const stk = S.stocks.find(s => s.sym === a.sym);
-    if (!stk || !stk.price) continue;
-    const p = parseFloat(stk.price);
-    if (a.above != null && p >= a.above) {
-      new Notification(`${a.sym} above ${a.above}`, {body:`Price: $${p.toFixed(2)} — triggered above alert`});
+  if (notifOk) {
+    for (const a of alerts) {
+      const stk = S.stocks.find(s => s.sym === a.sym);
+      if (!stk || !stk.price) continue;
+      const p = parseFloat(stk.price);
+      if (a.above != null && p >= a.above)
+        new Notification(`${a.sym} above $${a.above}`, {body:`Price: $${p.toFixed(2)} — above alert triggered`});
+      if (a.below != null && p <= a.below)
+        new Notification(`${a.sym} below $${a.below}`, {body:`Price: $${p.toFixed(2)} — below alert triggered`});
     }
-    if (a.below != null && p <= a.below) {
-      new Notification(`${a.sym} below ${a.below}`, {body:`Price: $${p.toFixed(2)} — triggered below alert`});
+  }
+
+  // ── Auto alerts: entry price & target price from each stock ──
+  const fired = ls.get('sig_alert_fired') || {};
+  const now   = Date.now();
+  const toastQueue = [];
+
+  for (const stk of S.stocks) {
+    if (!stk.price || stk.currency !== 'USD') continue;
+    const p    = parseFloat(stk.price);
+    const sym  = stk.sym;
+
+    // Entry price alert: price has dropped TO or BELOW entry (buy signal)
+    const entry = parseFloat(stk.entry_price);
+    if (!isNaN(entry) && entry > 0 && p <= entry) {
+      const key = `entry:${sym}`;
+      if (!fired[key] || now - fired[key] > 3600000) { // re-alert max once per hour
+        fired[key] = now;
+        toastQueue.push({sym, msg:`🟢 ${sym} hit entry $${entry} — now $${p.toFixed(2)}`, type:'entry'});
+        if (notifOk) new Notification(`${sym} reached entry price!`, {body:`Price $${p.toFixed(2)} ≤ entry $${entry} — consider buying`});
+      }
     }
+
+    // Target price alert: price has risen TO or ABOVE target (sell signal)
+    const tgt = parseFloat(stk.tgt_price);
+    if (!isNaN(tgt) && tgt > 0 && p >= tgt) {
+      const key = `tgt:${sym}`;
+      if (!fired[key] || now - fired[key] > 3600000) {
+        fired[key] = now;
+        toastQueue.push({sym, msg:`🎯 ${sym} hit target $${tgt} — now $${p.toFixed(2)}`, type:'target'});
+        if (notifOk) new Notification(`${sym} hit target price!`, {body:`Price $${p.toFixed(2)} ≥ target $${tgt} — consider selling`});
+      }
+    }
+  }
+
+  ls.set('sig_alert_fired', fired);
+
+  // Show toasts sequentially so they don't stack
+  toastQueue.forEach((t, i) => {
+    setTimeout(() => showToast(t.msg, false, 8000), i * 2500);
+  });
+
+  // Request notification permission if not yet granted
+  if (!notifOk && 'Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
   }
 }
 
