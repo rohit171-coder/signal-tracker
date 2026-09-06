@@ -428,6 +428,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{
   width:82px;text-align:right}
 .pf-inp:focus{outline:2px solid var(--accent);border-color:var(--accent)}
 .pf-del{background:none;border:none;color:var(--loss);cursor:pointer;font-size:13px;padding:0 4px}
+.pf-tbl td.pf-del-cell,.pf-tbl th.pf-del-cell{position:sticky;right:0;background:var(--surf);z-index:2;padding-left:6px}
+.pf-tbl tr:hover td.pf-del-cell{background:var(--surf2)}
 .pf-add-wrap{display:flex;gap:8px;align-items:center;margin-top:12px}
 .pf-add-sym{width:80px}
 
@@ -765,7 +767,7 @@ tr.kbnav td{background:var(--accent-t)!important}
             <th>P&amp;L</th>
             <th>%</th>
             <th style="text-align:center">Action</th>
-            <th></th>
+            <th class="pf-del-cell"></th>
           </tr></thead>
           <tbody id="pf-tbody"></tbody>
         </table>
@@ -2751,7 +2753,7 @@ function renderPortfolio() {
       <td class="${pc}">${val?ps+'$'+fmt2(pnl):'—'}</td>
       <td class="${pc}">${val?ps+pct.toFixed(2)+'%':'—'}</td>
       <td style="text-align:center">${renderSugCell(p, realIdx)}</td>
-      <td><button class="pf-del" onclick="deletePosition(${realIdx})">✕</button></td>
+      <td class="pf-del-cell"><button class="pf-del" onclick="deletePosition(${realIdx})">✕</button></td>
     </tr>`;
   }).join('') : `<tr><td colspan="11" style="text-align:center;padding:16px;color:var(--text3)">${pf.length?'No positions for this account.':'No positions yet.'}</td></tr>`;
   const totalPnl = totalVal - totalCost;
