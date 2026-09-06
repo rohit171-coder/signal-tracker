@@ -593,52 +593,69 @@ tr.kbnav td{background:var(--accent-t)!important}
       <button class="mclose" id="sm-close">✕</button>
     </div>
     <div class="mbody">
+      <!-- Lookup bar (Add mode only) -->
+      <div id="lookup-bar" style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+        <input class="fi" id="f-sym-lookup" placeholder="Ticker e.g. AAPL" style="flex:1;text-transform:uppercase;font-size:15px;font-weight:600"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();lookupTicker();}">
+        <button class="btn btn-p" id="lookup-btn" onclick="lookupTicker()" style="white-space:nowrap">🔍 Lookup</button>
+      </div>
+      <!-- Lookup status -->
+      <div id="lookup-status" style="font-size:12px;color:var(--text3);margin-bottom:10px;min-height:16px"></div>
+
       <form id="sform" class="fgrid" autocomplete="off">
-        <div class="fg"><label class="fl">Ticker Symbol</label>
-          <input class="fi" id="f-sym" placeholder="e.g. AAPL" required></div>
-        <div class="fg"><label class="fl">Company Name</label>
-          <input class="fi" id="f-name" placeholder="Apple Inc." required></div>
-        <div class="fg"><label class="fl">Industry / Sector</label>
+        <!-- Hidden fields populated by lookup -->
+        <input type="hidden" id="f-sym">
+        <input type="hidden" id="f-name">
+        <input type="hidden" id="f-cur">
+        <input type="hidden" id="f-mktcap">
+        <input type="hidden" id="f-price">
+        <input type="hidden" id="f-pe">
+        <input type="hidden" id="f-eps">
+        <input type="hidden" id="f-beta">
+        <input type="hidden" id="f-w52h">
+        <input type="hidden" id="f-w52l">
+        <input type="hidden" id="f-p1d">
+        <input type="hidden" id="f-p1m">
+        <input type="hidden" id="f-p3m">
+        <input type="hidden" id="f-p12m">
+
+        <!-- Live preview card (shown after lookup) -->
+        <div id="lookup-card" style="display:none;grid-column:1/-1;background:var(--surf2);border-radius:var(--r1);padding:12px 14px;margin-bottom:4px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px">
+            <div>
+              <span id="lc-name" style="font-weight:600;font-size:14px"></span>
+              <span id="lc-sym" style="font-size:12px;color:var(--text3);margin-left:6px"></span>
+            </div>
+            <span id="lc-price" style="font-size:18px;font-weight:700;color:var(--accent)"></span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:12px;color:var(--text2)">
+            <span>P/E <b id="lc-pe"></b></span>
+            <span>EPS <b id="lc-eps"></b></span>
+            <span>Beta <b id="lc-beta"></b></span>
+            <span>Mkt Cap <b id="lc-mktcap"></b></span>
+            <span>52W <b id="lc-range"></b></span>
+          </div>
+        </div>
+
+        <!-- Fields user fills in -->
+        <div class="fg"><label class="fl">Industry</label>
           <select class="fsel" id="f-broad"></select></div>
         <div class="fg"><label class="fl">Sub-sector</label>
-          <input class="fi" id="f-sector" placeholder="e.g. Tech SC"></div>
-        <div class="fg"><label class="fl">Currency</label>
-          <select class="fsel" id="f-cur">
-            <option value="USD">USD</option><option value="EUR">EUR</option>
-            <option value="GBX">GBX</option><option value="CAD">CAD</option>
-            <option value="AUD">AUD</option>
-          </select></div>
-        <div class="fg"><label class="fl">Mkt Cap $B</label>
-          <input class="fi" type="number" step="0.01" id="f-mktcap" placeholder="0.00"></div>
-        <div class="fg"><label class="fl">Price</label>
-          <input class="fi" type="number" step="0.01" id="f-price" placeholder="0.00"></div>
-        <div class="fg"><label class="fl">P/E Ratio</label>
-          <input class="fi" type="number" step="0.01" id="f-pe" placeholder="—"></div>
-        <div class="fg"><label class="fl">EPS</label>
-          <input class="fi" type="number" step="0.01" id="f-eps" placeholder="—"></div>
-        <div class="fg"><label class="fl">Beta</label>
-          <input class="fi" type="number" step="0.01" id="f-beta" placeholder="1.00"></div>
-        <div class="fg"><label class="fl">52W High</label>
-          <input class="fi" type="number" step="0.01" id="f-w52h" placeholder="—"></div>
-        <div class="fg"><label class="fl">52W Low</label>
-          <input class="fi" type="number" step="0.01" id="f-w52l" placeholder="—"></div>
-        <div class="fg"><label class="fl">Target Price</label>
-          <input class="fi" type="number" step="0.01" id="f-tgt" placeholder="—"></div>
+          <input class="fi" id="f-sector" placeholder="e.g. Fintech"></div>
         <div class="fg"><label class="fl">Rating</label>
-          <select class="fsel" id="f-rat">
+          <select class="fsel" id="f-rat" onchange="suggestPrices()">
             <option value="">Unrated</option>
             <option value="MO">Must Own</option>
             <option value="GO">Good to Own</option>
             <option value="MW">Must Watch</option>
           </select></div>
-        <div class="fg"><label class="fl">1D %</label>
-          <input class="fi" type="number" step="0.01" id="f-p1d" placeholder="—"></div>
-        <div class="fg"><label class="fl">1M %</label>
-          <input class="fi" type="number" step="0.01" id="f-p1m" placeholder="—"></div>
-        <div class="fg"><label class="fl">3M %</label>
-          <input class="fi" type="number" step="0.01" id="f-p3m" placeholder="—"></div>
-        <div class="fg"><label class="fl">12M %</label>
-          <input class="fi" type="number" step="0.01" id="f-p12m" placeholder="—"></div>
+        <div class="fg" style="grid-column:1/-1;font-size:11px;color:var(--text3);margin:-6px 0 2px" id="price-hint" hidden>
+          Prices auto-suggested from 52W range — adjust as needed
+        </div>
+        <div class="fg"><label class="fl">Entry Price $</label>
+          <input class="fi" type="number" step="0.01" id="f-entry" placeholder="Your buy target"></div>
+        <div class="fg"><label class="fl">Target Price $</label>
+          <input class="fi" type="number" step="0.01" id="f-tgt" placeholder="Your sell target"></div>
         <div class="fg s2"><label class="fl">Investment Thesis</label>
           <input class="fi" id="f-rationale" placeholder="Key investment rationale…"></div>
       </form>
@@ -933,6 +950,7 @@ const COLS = [
   {k:'tgt_price',lb:'Target $', c:'',       s:1,dv:1,nu:1},
   {k:'entry_price',lb:'Entry $',  c:'',       s:1,dv:1,nu:1},
   {k:'to_tgt',  lb:'% to Tgt',  c:'',       s:1,dv:1,nu:1,col:1,cp:1},
+  {k:'to_entry',lb:'% to Entry',c:'',       s:1,dv:1,nu:1,col:1,cp:1},
   {k:'avg_vol', lb:'Avg Vol $M',c:'',       s:1,dv:0,nu:1},
   {k:'daily_vol',lb:'Vol $M',   c:'',       s:1,dv:0,nu:1},
   {k:'rating',  lb:'Rating',    c:'C',      s:1,dv:1,nu:0},
@@ -1093,7 +1111,7 @@ function init() {
   }
 
   // Column schema version — bump when new columns are added to force a merge
-  const COL_VER = 'v4';  // entry_price + colOrder
+  const COL_VER = 'v5';  // to_entry column
   const savedColVer = ls.get('sig_col_ver');
   const defaultVisCols = COLS.filter(c=>c.dv).map(c=>c.k);
   const allKeys = COLS.map(c=>c.k);
@@ -1553,6 +1571,17 @@ function cell(s, col) {
   const v = s[col.k] || '';
   if (!v) return `<td class="na">—</td>`;
 
+  if (col.k==='to_entry') {
+    const n=parseFloat(v);
+    if (!isNaN(n)) {
+      // Negative = price already at/below entry (buy signal → green)
+      // Positive = price still above entry (hasn't dropped yet → red)
+      const cls = n<0?'pos':n>0?'neg':'';
+      const bg  = n<0?'bg-gain':n>0?'bg-loss':'';
+      const pfx = n>0?'+':'';
+      return `<td class="${cls} ${bg}">${pfx}${fmt(v)}%</td>`;
+    }
+  }
   if (col.col) {
     const n=parseFloat(v);
     if (!isNaN(n)) {
@@ -1630,27 +1659,134 @@ function openAdd() {
   document.getElementById('sm-sym').textContent='';
   document.getElementById('del-btn').hidden=true;
   document.getElementById('sform').reset();
-  // Pre-select current industry
-  if (S.activeInd!=='all') {
-    const sel=document.getElementById('f-broad');
-    sel.value = S.activeInd;
-  }
+  document.getElementById('f-sym-lookup').value='';
+  document.getElementById('lookup-bar').style.display='flex';
+  document.getElementById('lookup-status').textContent='';
+  document.getElementById('lookup-card').style.display='none';
+  document.getElementById('price-hint').hidden=true;
+  if (S.activeInd!=='all') document.getElementById('f-broad').value = S.activeInd;
   document.getElementById('smodal').hidden=false;
+  setTimeout(()=>document.getElementById('f-sym-lookup').focus(),80);
+}
+
+async function lookupTicker() {
+  const raw = document.getElementById('f-sym-lookup').value.trim().toUpperCase();
+  if (!raw) { showToast('Enter a ticker symbol', true); return; }
+
+  const btn = document.getElementById('lookup-btn');
+  const status = document.getElementById('lookup-status');
+  btn.disabled=true; btn.textContent='Looking up…'; status.textContent='';
+
+  try {
+    if (!PROXY_URL || PROXY_URL==='REPLACE_WITH_YOUR_APPS_SCRIPT_URL')
+      throw new Error('Proxy not configured');
+
+    const r = await fetch(`${PROXY_URL}?action=quotes&symbols=${raw}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error||'proxy error');
+
+    const q = d.data[raw];
+    if (!q) throw new Error(`${raw} not found on Yahoo Finance`);
+
+    // Populate hidden fields
+    document.getElementById('f-sym').value    = raw;
+    document.getElementById('f-name').value   = q.name||raw;
+    document.getElementById('f-cur').value    = q.currency||'USD';
+    document.getElementById('f-mktcap').value = q.mktcap ? (+q.mktcap/1e9).toFixed(2) : '';
+    document.getElementById('f-price').value  = q.price!=null ? (+q.price).toFixed(2) : '';
+    document.getElementById('f-pe').value     = q.pe!=null ? (+q.pe).toFixed(2) : '';
+    document.getElementById('f-eps').value    = q.eps!=null ? (+q.eps).toFixed(2) : '';
+    document.getElementById('f-beta').value   = q.beta!=null ? (+q.beta).toFixed(2) : '';
+    document.getElementById('f-w52h').value   = q.w52h!=null ? (+q.w52h).toFixed(2) : '';
+    document.getElementById('f-w52l').value   = q.w52l!=null ? (+q.w52l).toFixed(2) : '';
+    document.getElementById('f-p1d').value    = q.pct_1d!=null ? (+q.pct_1d).toFixed(2) : '';
+
+    // Show preview card
+    document.getElementById('lc-name').textContent  = q.name||raw;
+    document.getElementById('lc-sym').textContent   = raw;
+    document.getElementById('lc-price').textContent = q.price!=null ? `$${(+q.price).toFixed(2)}` : '—';
+    document.getElementById('lc-pe').textContent    = q.pe!=null ? (+q.pe).toFixed(1) : '—';
+    document.getElementById('lc-eps').textContent   = q.eps!=null ? `$${(+q.eps).toFixed(2)}` : '—';
+    document.getElementById('lc-beta').textContent  = q.beta!=null ? (+q.beta).toFixed(2) : '—';
+    document.getElementById('lc-mktcap').textContent= q.mktcap!=null ? `$${(+q.mktcap/1e9).toFixed(1)}B` : '—';
+    const hi=q.w52h!=null?(+q.w52h).toFixed(2):'—', lo=q.w52l!=null?(+q.w52l).toFixed(2):'—';
+    document.getElementById('lc-range').textContent = `$${lo} – $${hi}`;
+    document.getElementById('lookup-card').style.display='block';
+
+    // Stash raw quote for suggestPrices
+    S._lookupQ = q;
+    status.textContent = `✓ ${q.name||raw} found — set rating below`;
+    status.style.color = 'var(--gain)';
+
+    // Fetch period returns in background
+    fetch(`${PROXY_URL}?action=history&symbol=${raw}`).then(r=>r.json()).then(d=>{
+      if(!d.ok) return;
+      if(d.pct_1m!=null) document.getElementById('f-p1m').value=(+d.pct_1m).toFixed(2);
+      if(d.pct_3m!=null) document.getElementById('f-p3m').value=(+d.pct_3m).toFixed(2);
+      if(d.pct_12m!=null) document.getElementById('f-p12m').value=(+d.pct_12m).toFixed(2);
+    }).catch(()=>{});
+
+  } catch(err) {
+    status.textContent = '✗ ' + err.message;
+    status.style.color = 'var(--loss)';
+  }
+  btn.disabled=false; btn.textContent='🔍 Lookup';
+}
+
+function suggestPrices() {
+  const q = S._lookupQ;
+  if (!q) return;
+  const rat = document.getElementById('f-rat').value;
+  if (!rat) { document.getElementById('price-hint').hidden=true; return; }
+
+  const price = q.price!=null ? +q.price : null;
+  const w52h  = q.w52h!=null  ? +q.w52h  : null;
+  const w52l  = q.w52l!=null  ? +q.w52l  : null;
+  const tgt   = q.tgt_price!=null ? +q.tgt_price : null;
+
+  let entry=null, target=null;
+
+  if (price) {
+    if (rat==='MO') {
+      // Must Own: buy near 52W low, target = analyst or 52W high
+      entry  = w52l ? +(w52l * 1.08).toFixed(2) : +(price * 0.88).toFixed(2);
+      target = tgt  ? +tgt.toFixed(2) : (w52h ? +(w52h * 0.97).toFixed(2) : +(price * 1.30).toFixed(2));
+    } else if (rat==='GO') {
+      // Good to Own: buy on 10% pullback, target = analyst or 20% upside
+      entry  = +(price * 0.90).toFixed(2);
+      target = tgt ? +tgt.toFixed(2) : +(price * 1.20).toFixed(2);
+    } else if (rat==='MW') {
+      // Must Watch: wait for bigger pullback, target = analyst or 15% upside
+      entry  = +(price * 0.82).toFixed(2);
+      target = tgt ? +tgt.toFixed(2) : +(price * 1.15).toFixed(2);
+    }
+  }
+
+  if (entry!=null) document.getElementById('f-entry').value = entry;
+  if (target!=null) document.getElementById('f-tgt').value  = target;
+  document.getElementById('price-hint').hidden = false;
 }
 
 function openEdit(sym) {
   const s=S.stocks.find(x=>x.sym===sym);
   if(!s) return;
   S.editSym=sym;
+  S._lookupQ=null;
   document.getElementById('sm-title').textContent='Edit Stock';
   document.getElementById('sm-sym').textContent=sym;
   document.getElementById('del-btn').hidden=false;
+  document.getElementById('lookup-bar').style.display='none';
+  document.getElementById('lookup-status').textContent='';
+  document.getElementById('lookup-card').style.display='none';
+  document.getElementById('price-hint').hidden=true;
   const f=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   f('f-sym',s.sym); f('f-name',s.name); f('f-broad',s.broad);
   f('f-sector',s.sector); f('f-cur',s.currency||'USD');
   f('f-mktcap',s.mktcap); f('f-price',s.price); f('f-pe',s.pe);
   f('f-eps',s.eps); f('f-beta',s.beta); f('f-w52h',s.w52h);
   f('f-w52l',s.w52l); f('f-tgt',s.tgt_price); f('f-rat',s.rating||'');
+  f('f-entry',s.entry_price||'');
   f('f-p1d',s.pct_1d); f('f-p1m',s.pct_1m); f('f-p3m',s.pct_3m);
   f('f-p12m',s.pct_12m); f('f-rationale',s.rationale);
   document.getElementById('smodal').hidden=false;
@@ -1661,12 +1797,12 @@ function saveStock() {
   const sym=g('f-sym').trim().toUpperCase();
   if(!sym){showToast('Ticker is required',true);return;}
   const s={
-    sym, name:g('f-name').trim(),
+    sym, name:g('f-name').trim()||sym,
     broad:g('f-broad'), sector:g('f-sector').trim(),
     currency:g('f-cur')||'USD',
     mktcap:g('f-mktcap'), price:g('f-price'), pe:g('f-pe'),
     eps:g('f-eps'), beta:g('f-beta'), w52h:g('f-w52h'), w52l:g('f-w52l'),
-    tgt_price:g('f-tgt'), rating:g('f-rat'),
+    tgt_price:g('f-tgt'), entry_price:g('f-entry'), rating:g('f-rat'),
     pct_1d:g('f-p1d'), pct_1m:g('f-p1m'), pct_3m:g('f-p3m'),
     pct_6m:'', pct_12m:g('f-p12m'), pct_ytd:'',
     day_chng:'', avg_vol:'', daily_vol:'',
