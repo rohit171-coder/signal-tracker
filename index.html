@@ -739,10 +739,10 @@ tr.kbnav td{background:var(--accent-t)!important}
       </div>
       <div id="pf-acct-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
         <button class="acct-tab active" data-acct="all">All</button>
-        <button class="acct-tab" data-acct="eToro">eToro</button>
-        <button class="acct-tab" data-acct="T212_ISA">T212 ISA</button>
-        <button class="acct-tab" data-acct="T212_Inv">T212 Invest</button>
-        <button class="acct-tab" data-acct="IBKR">IBKR</button>
+        <button class="acct-tab" data-acct="ISA">ISA</button>
+        <button class="acct-tab" data-acct="P2">Portfolio 2</button>
+        <button class="acct-tab" data-acct="P3">Portfolio 3</button>
+        <button class="acct-tab" data-acct="P4">Portfolio 4</button>
       </div>
       <div class="pf-tbl-wrap">
         <table class="pf-tbl">
@@ -766,10 +766,10 @@ tr.kbnav td{background:var(--accent-t)!important}
         <input class="fi pf-inp" id="pf-add-sh" placeholder="Shares" type="number" min="0" step="0.001">
         <input class="fi pf-inp" id="pf-add-cost" placeholder="Cost/sh" type="number" min="0" step="0.01">
         <select class="fi pf-inp" id="pf-add-acct" style="font-family:var(--mono);font-size:12px">
-          <option value="eToro">eToro</option>
-          <option value="T212_ISA">T212 ISA</option>
-          <option value="T212_Inv">T212 Invest</option>
-          <option value="IBKR">IBKR</option>
+          <option value="ISA">ISA</option>
+          <option value="P2">Portfolio 2</option>
+          <option value="P3">Portfolio 3</option>
+          <option value="P4">Portfolio 4</option>
           <option value="Manual">Manual</option>
         </select>
         <button class="btn btn-p" id="pf-add-btn">Add Position</button>
@@ -2570,81 +2570,82 @@ function getPortfolio() { return ls.get('sig_portfolio') || []; }
 function savePortfolio(arr) { ls.set('sig_portfolio', arr); }
 
 function seedPortfolioIfEmpty() {
-  if (ls.get('sig_portfolio_seeded')) return;
+  if (ls.get('sig_portfolio_seeded_v2')) return;
   const existing = ls.get('sig_portfolio') || [];
-  if (existing.length > 0) { ls.set('sig_portfolio_seeded', true); return; }
+  if (existing.length > 0) { ls.set('sig_portfolio_seeded_v2', true); return; }
   const seed = [
-    // eToro
-    {sym:'OABI', shares:59.99271, cost:5.49,      account:'eToro',    currency:'USD'},
-    {sym:'ROOT', shares:40,       cost:82.485,    account:'eToro',    currency:'USD'},
-    {sym:'PYPL', shares:63.51626, cost:78.72,     account:'eToro',    currency:'USD'},
-    {sym:'DUOL', shares:13.28364, cost:376.40272, account:'eToro',    currency:'USD'},
-    {sym:'SMCI', shares:2.80046,  cost:99.098,    account:'eToro',    currency:'USD'},
-    // IBKR
-    {sym:'BMNR', shares:38,       cost:46.36,     account:'IBKR',     currency:'USD'},
-    {sym:'HIMS', shares:30,       cost:44.68,     account:'IBKR',     currency:'USD'},
-    // T212 ISA — avg cost = (value+|P/L|)/shares
-    {sym:'HIMS', shares:612.45,   cost:31.96,     account:'T212_ISA', currency:'USD'},
-    {sym:'INOD', shares:260,      cost:47.71,     account:'T212_ISA', currency:'USD'},
-    {sym:'PGY',  shares:630,      cost:23.06,     account:'T212_ISA', currency:'USD'},
-    {sym:'BMNR', shares:541.55,   cost:33.69,     account:'T212_ISA', currency:'USD'},
-    {sym:'ROOT', shares:199.57,   cost:74.60,     account:'T212_ISA', currency:'USD'},
-    {sym:'CLS',  shares:36.38,    cost:234.16,    account:'T212_ISA', currency:'USD'},
-    {sym:'IREN', shares:269,      cost:35.44,     account:'T212_ISA', currency:'USD'},
-    {sym:'NOW',  shares:64.29,    cost:138.63,    account:'T212_ISA', currency:'USD'},
-    {sym:'META', shares:14.97,    cost:459.47,    account:'T212_ISA', currency:'USD'},
-    {sym:'GRAB', shares:2210,     cost:3.30,      account:'T212_ISA', currency:'USD'},
-    {sym:'NFLX', shares:73,       cost:69.27,     account:'T212_ISA', currency:'USD'},
-    {sym:'SYM',  shares:141.46,   cost:37.76,     account:'T212_ISA', currency:'USD'},
-    {sym:'AVGO', shares:15,       cost:281.84,    account:'T212_ISA', currency:'USD'},
-    {sym:'UPST', shares:185,      cost:43.39,     account:'T212_ISA', currency:'USD'},
-    {sym:'AKAM', shares:47.5,     cost:88.97,     account:'T212_ISA', currency:'USD'},
-    {sym:'OKLO', shares:122,      cost:42.40,     account:'T212_ISA', currency:'USD'},
-    {sym:'SMR',  shares:520,      cost:9.86,      account:'T212_ISA', currency:'USD'},
-    {sym:'FOUR', shares:100,      cost:58.12,     account:'T212_ISA', currency:'USD'},
-    {sym:'LUMN', shares:700,      cost:7.07,      account:'T212_ISA', currency:'USD'},
-    {sym:'BULL', shares:450,      cost:9.52,      account:'T212_ISA', currency:'USD'},
-    {sym:'NVDA', shares:19,       cost:153.14,    account:'T212_ISA', currency:'USD'},
-    {sym:'MU',   shares:4.39,     cost:675.13,    account:'T212_ISA', currency:'USD'},
-    {sym:'SOFI', shares:213.12,   cost:13.47,     account:'T212_ISA', currency:'USD'},
-    {sym:'ALAB', shares:12.5,     cost:221.87,    account:'T212_ISA', currency:'USD'},
-    {sym:'LEU',  shares:20,       cost:147.97,    account:'T212_ISA', currency:'USD'},
-    {sym:'CPRT', shares:99.96,    cost:25.90,     account:'T212_ISA', currency:'USD'},
-    {sym:'QCOM', shares:19,       cost:139.17,    account:'T212_ISA', currency:'USD'},
-    {sym:'RZLV', shares:1050,     cost:3.98,      account:'T212_ISA', currency:'USD'},
-    {sym:'COHR', shares:10.35,    cost:234.59,    account:'T212_ISA', currency:'USD'},
-    {sym:'TSM',  shares:6.5,      cost:307.98,    account:'T212_ISA', currency:'USD'},
-    {sym:'RKLB', shares:42,       cost:55.28,     account:'T212_ISA', currency:'USD'},
-    {sym:'SNPS', shares:6,        cost:363.59,    account:'T212_ISA', currency:'USD'},
-    {sym:'CRNT', shares:1200,     cost:3.43,      account:'T212_ISA', currency:'USD'},
-    {sym:'ANET', shares:13,       cost:153.65,    account:'T212_ISA', currency:'USD'},
-    {sym:'QS',   shares:440,      cost:6.31,      account:'T212_ISA', currency:'USD'},
-    {sym:'TTD',  shares:181.46,   cost:62.08,     account:'T212_ISA', currency:'USD'},
-    {sym:'BWXT', shares:16,       cost:139.02,    account:'T212_ISA', currency:'USD'},
-    {sym:'ONDS', shares:300,      cost:6.50,      account:'T212_ISA', currency:'USD'},
-    {sym:'AMKR', shares:47,       cost:38.30,     account:'T212_ISA', currency:'USD'},
-    {sym:'AMAT', shares:4.8,      cost:376.44,    account:'T212_ISA', currency:'USD'},
-    {sym:'APLD', shares:80,       cost:28.24,     account:'T212_ISA', currency:'USD'},
-    {sym:'CRDO', shares:8.34,     cost:173.96,    account:'T212_ISA', currency:'USD'},
-    {sym:'UBER', shares:23.94,    cost:56.99,     account:'T212_ISA', currency:'USD'},
-    {sym:'PRME', shares:500,      cost:3.58,      account:'T212_ISA', currency:'USD'},
-    {sym:'TOST', shares:50,       cost:29.77,     account:'T212_ISA', currency:'USD'},
-    {sym:'PYPL', shares:30,       cost:49.92,     account:'T212_ISA', currency:'USD'},
-    {sym:'HOOD', shares:15,       cost:66.26,     account:'T212_ISA', currency:'USD'},
-    {sym:'ASTS', shares:25,       cost:49.29,     account:'T212_ISA', currency:'USD'},
-    {sym:'TSSI', shares:150,      cost:8.48,      account:'T212_ISA', currency:'USD'},
-    {sym:'PINS', shares:50,       cost:25.07,     account:'T212_ISA', currency:'USD'},
-    {sym:'MSTR', shares:7,        cost:207.47,    account:'T212_ISA', currency:'USD'},
-    {sym:'RBLX', shares:16,       cost:83.61,     account:'T212_ISA', currency:'USD'},
-    {sym:'AIIO', shares:110,      cost:24.19,     account:'T212_ISA', currency:'USD'},
-    // T212 Invest
-    {sym:'ROOT', shares:35,       cost:65.29,     account:'T212_Inv', currency:'USD'},
-    {sym:'HIMS', shares:45.50,    cost:32.35,     account:'T212_Inv', currency:'USD'},
-    {sym:'BMNR', shares:40,       cost:30.64,     account:'T212_Inv', currency:'USD'},
-    {sym:'EL',   shares:7.17,     cost:97.51,     account:'T212_Inv', currency:'USD'},
+    // ── ISA (Trading 212 ISA) ──────────────────────────────────────────
+    {sym:'HIMS', shares:612.45,   cost:31.96,     account:'ISA', currency:'USD'},
+    {sym:'INOD', shares:260,      cost:47.71,     account:'ISA', currency:'USD'},
+    {sym:'PGY',  shares:630,      cost:23.06,     account:'ISA', currency:'USD'},
+    {sym:'BMNR', shares:541.55,   cost:33.69,     account:'ISA', currency:'USD'},
+    {sym:'ROOT', shares:199.57,   cost:74.60,     account:'ISA', currency:'USD'},
+    {sym:'CLS',  shares:36.38,    cost:234.16,    account:'ISA', currency:'USD'},
+    {sym:'IREN', shares:269,      cost:35.44,     account:'ISA', currency:'USD'},
+    {sym:'NOW',  shares:64.29,    cost:138.63,    account:'ISA', currency:'USD'},
+    {sym:'META', shares:14.97,    cost:459.47,    account:'ISA', currency:'USD'},
+    {sym:'GRAB', shares:2210,     cost:3.30,      account:'ISA', currency:'USD'},
+    {sym:'NFLX', shares:73,       cost:69.27,     account:'ISA', currency:'USD'},
+    {sym:'SYM',  shares:141.46,   cost:37.76,     account:'ISA', currency:'USD'},
+    {sym:'AVGO', shares:15,       cost:281.84,    account:'ISA', currency:'USD'},
+    {sym:'UPST', shares:185,      cost:43.39,     account:'ISA', currency:'USD'},
+    {sym:'AKAM', shares:47.5,     cost:88.97,     account:'ISA', currency:'USD'},
+    {sym:'OKLO', shares:122,      cost:42.40,     account:'ISA', currency:'USD'},
+    {sym:'SMR',  shares:520,      cost:9.86,      account:'ISA', currency:'USD'},
+    {sym:'FOUR', shares:100,      cost:58.12,     account:'ISA', currency:'USD'},
+    {sym:'LUMN', shares:700,      cost:7.07,      account:'ISA', currency:'USD'},
+    {sym:'BULL', shares:450,      cost:9.52,      account:'ISA', currency:'USD'},
+    {sym:'NVDA', shares:19,       cost:153.14,    account:'ISA', currency:'USD'},
+    {sym:'MU',   shares:4.39,     cost:675.13,    account:'ISA', currency:'USD'},
+    {sym:'SOFI', shares:213.12,   cost:13.47,     account:'ISA', currency:'USD'},
+    {sym:'ALAB', shares:12.5,     cost:221.87,    account:'ISA', currency:'USD'},
+    {sym:'LEU',  shares:20,       cost:147.97,    account:'ISA', currency:'USD'},
+    {sym:'CPRT', shares:99.96,    cost:25.90,     account:'ISA', currency:'USD'},
+    {sym:'QCOM', shares:19,       cost:139.17,    account:'ISA', currency:'USD'},
+    {sym:'RZLV', shares:1050,     cost:3.98,      account:'ISA', currency:'USD'},
+    {sym:'COHR', shares:10.35,    cost:234.59,    account:'ISA', currency:'USD'},
+    {sym:'TSM',  shares:6.5,      cost:307.98,    account:'ISA', currency:'USD'},
+    {sym:'RKLB', shares:42,       cost:55.28,     account:'ISA', currency:'USD'},
+    {sym:'SNPS', shares:6,        cost:363.59,    account:'ISA', currency:'USD'},
+    {sym:'CRNT', shares:1200,     cost:3.43,      account:'ISA', currency:'USD'},
+    {sym:'ANET', shares:13,       cost:153.65,    account:'ISA', currency:'USD'},
+    {sym:'QS',   shares:440,      cost:6.31,      account:'ISA', currency:'USD'},
+    {sym:'TTD',  shares:181.46,   cost:62.08,     account:'ISA', currency:'USD'},
+    {sym:'BWXT', shares:16,       cost:139.02,    account:'ISA', currency:'USD'},
+    {sym:'ONDS', shares:300,      cost:6.50,      account:'ISA', currency:'USD'},
+    {sym:'AMKR', shares:47,       cost:38.30,     account:'ISA', currency:'USD'},
+    {sym:'AMAT', shares:4.8,      cost:376.44,    account:'ISA', currency:'USD'},
+    {sym:'APLD', shares:80,       cost:28.24,     account:'ISA', currency:'USD'},
+    {sym:'CRDO', shares:8.34,     cost:173.96,    account:'ISA', currency:'USD'},
+    {sym:'UBER', shares:23.94,    cost:56.99,     account:'ISA', currency:'USD'},
+    {sym:'PRME', shares:500,      cost:3.58,      account:'ISA', currency:'USD'},
+    {sym:'TOST', shares:50,       cost:29.77,     account:'ISA', currency:'USD'},
+    {sym:'PYPL', shares:30,       cost:49.92,     account:'ISA', currency:'USD'},
+    {sym:'HOOD', shares:15,       cost:66.26,     account:'ISA', currency:'USD'},
+    {sym:'ASTS', shares:25,       cost:49.29,     account:'ISA', currency:'USD'},
+    {sym:'TSSI', shares:150,      cost:8.48,      account:'ISA', currency:'USD'},
+    {sym:'PINS', shares:50,       cost:25.07,     account:'ISA', currency:'USD'},
+    {sym:'MSTR', shares:7,        cost:207.47,    account:'ISA', currency:'USD'},
+    {sym:'RBLX', shares:16,       cost:83.61,     account:'ISA', currency:'USD'},
+    {sym:'AIIO', shares:110,      cost:24.19,     account:'ISA', currency:'USD'},
+    {sym:'AMZN', shares:7.6,      cost:208.54,    account:'ISA', currency:'USD'},  // NEW Sep 6
+    // ── Portfolio 2 (eToro) ────────────────────────────────────────────
+    {sym:'OABI', shares:59.99271, cost:5.49,      account:'P2',  currency:'USD'},
+    {sym:'ROOT', shares:40,       cost:82.485,    account:'P2',  currency:'USD'},
+    {sym:'PYPL', shares:63.51626, cost:78.72,     account:'P2',  currency:'USD'},
+    {sym:'DUOL', shares:13.28364, cost:376.40272, account:'P2',  currency:'USD'},
+    {sym:'SMCI', shares:2.80046,  cost:99.098,    account:'P2',  currency:'USD'},
+    // ── Portfolio 3 (T212 Invest) ──────────────────────────────────────
+    {sym:'ROOT', shares:35,       cost:65.29,     account:'P3',  currency:'USD'},
+    {sym:'HIMS', shares:45.50,    cost:32.35,     account:'P3',  currency:'USD'},
+    {sym:'BMNR', shares:40,       cost:30.64,     account:'P3',  currency:'USD'},
+    {sym:'EL',   shares:7.17,     cost:97.51,     account:'P3',  currency:'USD'},
+    // ── Portfolio 4 (IBKR) ────────────────────────────────────────────
+    {sym:'BMNR', shares:38,       cost:46.36,     account:'P4',  currency:'USD'},
+    {sym:'HIMS', shares:30,       cost:44.68,     account:'P4',  currency:'USD'},
   ];
   ls.set('sig_portfolio', seed);
-  ls.set('sig_portfolio_seeded', true);
+  ls.set('sig_portfolio_seeded_v2', true);
 }
 
 function setupPortfolio() {
@@ -2687,7 +2688,7 @@ function renderPortfolio() {
   });
   const shown = _pfAcctFilter==='all' ? pf : pf.filter(p=>p.account===_pfAcctFilter);
   let totalVal=0, totalCost=0;
-  const ACCT_COL = {eToro:'#00C6B3',T212_ISA:'#1E8BC3',T212_Inv:'#5B8DD9',IBKR:'#D4813A'};
+  const ACCT_COL = {ISA:'#00BAA0',P2:'#1E8BC3',P3:'#5B8DD9',P4:'#D4813A'};
   tbody.innerHTML = shown.length ? shown.map((p,i) => {
     const realIdx = pf.indexOf(p);
     const stk = S.stocks.find(s => s.sym === p.sym);
