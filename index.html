@@ -2665,7 +2665,21 @@ function setupPortfolio() {
   document.getElementById('pf-export-btn').addEventListener('click', exportPortfolio);
 }
 
+function migrateAccountNames() {
+  // Normalise old underscore/abbreviated account names to current labels
+  const MAP = {'T212_ISA':'T212 ISA','T212_Inv':'T212 Invest','T212 ISA':'T212 ISA','T212 Invest':'T212 Invest','eToro':'eToro','IBKR':'IBKR'};
+  const pf = getPortfolio();
+  let changed = false;
+  pf.forEach(p => {
+    if (p.account && MAP[p.account] && MAP[p.account] !== p.account) {
+      p.account = MAP[p.account]; changed = true;
+    }
+  });
+  if (changed) savePortfolio(pf);
+}
+
 function openPortfolio() {
+  migrateAccountNames();
   applySuggestionDefaults();
   renderPortfolio();
   document.getElementById('portfolio-modal').hidden = false;
