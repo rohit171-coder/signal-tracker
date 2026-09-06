@@ -494,6 +494,14 @@ tr.kbnav td{background:var(--accent-t)!important}
 .acct-tab{padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .15s}
 .acct-tab:hover{background:var(--bg3);color:var(--text1)}
 .acct-tab.active{background:var(--acc);color:#000;border-color:var(--acc)}
+
+.sug-pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;font-family:var(--sans);cursor:pointer;white-space:nowrap;letter-spacing:.3px;transition:opacity .15s}
+.sug-pill:hover{opacity:.8}
+.sug-SELL{background:rgba(239,68,68,.18);color:#ef4444}
+.sug-REDUCE{background:rgba(249,115,22,.18);color:#f97316}
+.sug-HOLD{background:rgba(148,163,184,.15);color:var(--text2)}
+.sug-ADD{background:rgba(34,197,94,.18);color:#22c55e}
+.sug-edit{display:none;font-size:11px;padding:2px 4px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text1);font-family:var(--sans)}
 </style>
 
 <!-- APP BAR -->
@@ -756,6 +764,7 @@ tr.kbnav td{background:var(--accent-t)!important}
             <th>Value</th>
             <th>P&amp;L</th>
             <th>%</th>
+            <th style="text-align:center">Action</th>
             <th></th>
           </tr></thead>
           <tbody id="pf-tbody"></tbody>
@@ -2657,6 +2666,7 @@ function setupPortfolio() {
 }
 
 function openPortfolio() {
+  applySuggestionDefaults();
   renderPortfolio();
   document.getElementById('portfolio-modal').hidden = false;
 }
@@ -2715,9 +2725,10 @@ function renderPortfolio() {
       <td>${val?'$'+fmt2(val):'—'}</td>
       <td class="${pc}">${val?ps+'$'+fmt2(pnl):'—'}</td>
       <td class="${pc}">${val?ps+pct.toFixed(2)+'%':'—'}</td>
+      <td style="text-align:center">${renderSugCell(p, realIdx)}</td>
       <td><button class="pf-del" onclick="deletePosition(${realIdx})">✕</button></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="10" style="text-align:center;padding:16px;color:var(--text3)">${pf.length?'No positions for this account.':'No positions yet.'}</td></tr>`;
+  }).join('') : `<tr><td colspan="11" style="text-align:center;padding:16px;color:var(--text3)">${pf.length?'No positions for this account.':'No positions yet.'}</td></tr>`;
   const totalPnl = totalVal - totalCost;
   const totalRet = totalCost ? (totalPnl/totalCost*100) : 0;
   const fmt = n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -2733,6 +2744,63 @@ function renderPortfolio() {
   retEl.className = 'psv ' + pc(totalRet);
   document.getElementById('pf-pos').textContent = pf.length;
   // end renderPortfolio
+}
+
+
+const _PORTFOLIO_SUGGESTIONS = {
+  // SELL
+  TTD:'SELL',AIIO:'SELL',RZLV:'SELL',CRNT:'SELL',RBLX:'SELL',
+  MSTR:'SELL',LUMN:'SELL',OKLO:'SELL',SMR:'SELL',BULL:'SELL',
+  GRAB:'SELL',TSSI:'SELL',PRME:'SELL',ONDS:'SELL',QS:'SELL',
+  PINS:'SELL',ASTS:'SELL',
+  // REDUCE
+  PGY:'REDUCE',BMNR:'REDUCE',ROOT:'REDUCE',HIMS:'REDUCE',
+  INOD:'REDUCE',UPST:'REDUCE',FOUR:'REDUCE',SOFI:'REDUCE',
+  // ADD ON DIP
+  NVDA:'ADD ON DIP',MU:'ADD ON DIP',NOW:'ADD ON DIP',AMZN:'ADD ON DIP',
+  // HOLD
+  META:'HOLD',AVGO:'HOLD',TSM:'HOLD',CLS:'HOLD',ANET:'HOLD',
+  COHR:'HOLD',CRDO:'HOLD',BWXT:'HOLD',IREN:'HOLD',NFLX:'HOLD',
+  QCOM:'HOLD',SNPS:'HOLD',AMAT:'HOLD',CPRT:'HOLD',AKAM:'HOLD',
+};
+const _SUG_CYCLE = ['SELL','REDUCE','HOLD','ADD ON DIP'];
+
+function applySuggestionDefaults() {
+  const pf = getPortfolio();
+  let changed = false;
+  pf.forEach(p => {
+    if (!p.suggestion && _PORTFOLIO_SUGGESTIONS[p.sym]) {
+      p.suggestion = _PORTFOLIO_SUGGESTIONS[p.sym];
+      changed = true;
+    }
+  });
+  if (changed) savePortfolio(pf);
+}
+
+function renderSugCell(p, idx) {
+  const sug = p.suggestion || '';
+  const cls = sug ? 'sug-' + sug.replace(' ON DIP','').replace(' ','') : '';
+  const label = sug || '—';
+  const opts = _SUG_CYCLE.map(s => `<option value="${s}"${sug===s?' selected':''}>${s}</option>`).join('');
+  return `<span class="sug-pill ${cls}" title="Click to change" onclick="cycleSuggestion(${idx},this)">${label}</span>
+    <select class="sug-edit" onchange="setSuggestion(${idx},this.value,this)">${opts}<option value="">— clear —</option></select>`;
+}
+
+function cycleSuggestion(idx, el) {
+  // Show the select instead of cycling
+  const sel = el.nextElementSibling;
+  el.style.display = 'none';
+  sel.style.display = 'inline-block';
+  sel.focus();
+  sel.onblur = () => { sel.style.display='none'; el.style.display=''; };
+}
+
+function setSuggestion(idx, val, selEl) {
+  const pf = getPortfolio();
+  if (!pf[idx]) return;
+  pf[idx].suggestion = val;
+  savePortfolio(pf);
+  renderPortfolio();
 }
 
 function updatePosition(i, key, val) {
