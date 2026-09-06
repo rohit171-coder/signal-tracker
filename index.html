@@ -2665,6 +2665,16 @@ function setupPortfolio() {
   document.getElementById('pf-export-btn').addEventListener('click', exportPortfolio);
 }
 
+function clearSuggestionCache() {
+  // Re-derive suggestions from rating if they were set to the generic HOLD default
+  // (distinguishable from analysis-set HOLDs by checking if sym is in the map)
+  if (ls.get('sig_sug_migrated_v2')) return;
+  const pf = getPortfolio();
+  pf.forEach(p => { if (p.suggestion && !_PORTFOLIO_SUGGESTIONS[p.sym]) delete p.suggestion; });
+  savePortfolio(pf);
+  ls.set('sig_sug_migrated_v2', true);
+}
+
 function migrateAccountNames() {
   // Normalise old underscore/abbreviated account names to current labels
   const MAP = {'T212_ISA':'T212 ISA','T212_Inv':'T212 Invest','T212 ISA':'T212 ISA','T212 Invest':'T212 Invest','eToro':'eToro','IBKR':'IBKR'};
@@ -2680,6 +2690,7 @@ function migrateAccountNames() {
 
 function openPortfolio() {
   migrateAccountNames();
+  clearSuggestionCache();
   applySuggestionDefaults();
   renderPortfolio();
   document.getElementById('portfolio-modal').hidden = false;
@@ -2730,7 +2741,7 @@ function renderPortfolio() {
     return `<tr>
       <td>${p.sym}</td>
       <td><span style="font-size:10px;background:${ac}22;color:${ac};padding:1px 5px;border-radius:8px">${acct}</span></td>
-      <td>${stk?.name||'—'}</td>
+      <td>${stk?.name||p.sym}</td>
       <td><input class="pf-inp" type="number" step="0.001" value="${p.shares}"
         onchange="updatePosition(${realIdx},'shares',this.value)"></td>
       <td><input class="pf-inp" type="number" step="0.01" value="${p.cost}"
@@ -2783,8 +2794,16 @@ function applySuggestionDefaults() {
   const pf = getPortfolio();
   let changed = false;
   pf.forEach(p => {
-    if (!p.suggestion && _PORTFOLIO_SUGGESTIONS[p.sym]) {
-      p.suggestion = _PORTFOLIO_SUGGESTIONS[p.sym];
+    if (!p.suggestion) {
+      if (_PORTFOLIO_SUGGESTIONS[p.sym]) {
+        // Explicit override from analysis takes priority
+        p.suggestion = _PORTFOLIO_SUGGESTIONS[p.sym];
+      } else {
+        // Derive from tracker rating: MO→ADD ON DIP, GO/MW→HOLD, else HOLD
+        const stk = S.stocks.find(s => s.sym === p.sym);
+        const rating = stk?.rating || '';
+        p.suggestion = rating === 'MO' ? 'ADD ON DIP' : 'HOLD';
+      }
       changed = true;
     }
   });
