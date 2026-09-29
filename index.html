@@ -403,35 +403,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{
 .ml-chg{font-family:var(--mono);font-size:11px;flex-shrink:0}
 .ml-chg.pos{color:var(--gain)}.ml-chg.neg{color:var(--loss)}
 
-/* ── PORTFOLIO MODAL ── */
-.portfolio-modal{max-width:860px;width:95vw;max-height:86vh}
-.pf-summary{display:flex;gap:20px;background:var(--surf2);border:1px solid var(--border);
-  border-radius:6px;padding:12px 16px;margin-bottom:16px;flex-wrap:wrap}
-.pf-stat .psl{font-size:10px;color:var(--text3);font-family:var(--mono);
-  text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:2px}
-.pf-stat .psv{font-size:15px;font-family:var(--mono);color:var(--text1);
-  font-weight:600;font-variant-numeric:tabular-nums}
-.pf-stat .psv.pos{color:var(--gain)}.pf-stat .psv.neg{color:var(--loss)}
-.pf-tbl-wrap{overflow:auto;max-height:420px}
-.pf-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.pf-tbl th{font-family:var(--mono);font-size:10px;color:var(--text3);
-  text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;
-  border-bottom:2px solid var(--border);text-align:right;background:var(--surf);
-  position:sticky;top:0}
-.pf-tbl th:first-child,.pf-tbl th:nth-child(2){text-align:left}
-.pf-tbl td{padding:5px 8px;border-bottom:1px solid var(--border);
-  text-align:right;font-family:var(--mono);font-size:11px;vertical-align:middle}
-.pf-tbl td:first-child{text-align:left;font-weight:700;color:var(--text1)}
-.pf-tbl td:nth-child(2){text-align:left;color:var(--text2);font-family:var(--sans)}
-.pf-inp{background:var(--surf2);border:1px solid var(--border);color:var(--text1);
-  font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;
-  width:82px;text-align:right}
-.pf-inp:focus{outline:2px solid var(--accent);border-color:var(--accent)}
-.pf-del{background:none;border:none;color:var(--loss);cursor:pointer;font-size:13px;padding:0 4px}
-.pf-tbl td.pf-del-cell,.pf-tbl th.pf-del-cell{position:sticky;right:0;background:var(--surf);z-index:2;padding-left:6px}
-.pf-tbl tr:hover td.pf-del-cell{background:var(--surf2)}
-.pf-add-wrap{display:flex;gap:8px;align-items:center;margin-top:12px}
-.pf-add-sym{width:80px}
 
 /* ── NEWS DRAWER ── */
 .news-drawer{position:fixed;top:0;right:-440px;width:420px;height:100%;
@@ -493,17 +464,6 @@ tr.kbnav td{background:var(--accent-t)!important}
 
 /* ── DIVIDEND ── */
 .div-val{color:var(--gain)}
-.acct-tab{padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .15s}
-.acct-tab:hover{background:var(--bg3);color:var(--text1)}
-.acct-tab.active{background:var(--acc);color:#000;border-color:var(--acc)}
-
-.sug-pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;font-family:var(--sans);cursor:pointer;white-space:nowrap;letter-spacing:.3px;transition:opacity .15s}
-.sug-pill:hover{opacity:.8}
-.sug-SELL{background:rgba(239,68,68,.18);color:#ef4444}
-.sug-REDUCE{background:rgba(249,115,22,.18);color:#f97316}
-.sug-HOLD{background:rgba(148,163,184,.15);color:var(--text2)}
-.sug-ADD{background:rgba(34,197,94,.18);color:#22c55e}
-.sug-edit{display:none;font-size:11px;padding:2px 4px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text1);font-family:var(--sans)}
 </style>
 
 <!-- APP BAR -->
@@ -570,7 +530,6 @@ tr.kbnav td{background:var(--accent-t)!important}
   <span class="fsep"></span>
   <div class="vbtn-group">
     <button class="vbtn" id="analytics-btn">📊 Analytics</button>
-    <button class="vbtn" id="portfolio-btn">💼 Portfolio</button>
     <button class="vbtn" id="alerts-btn">🔔 Alerts</button>
     <button class="vbtn" id="news-open-btn" title="Open News — click any ticker in table">📰 News</button>
   </div>
@@ -732,65 +691,6 @@ tr.kbnav td{background:var(--accent-t)!important}
   </div>
 </div>
 
-<!-- PORTFOLIO MODAL -->
-<div class="overlay" id="portfolio-modal" hidden>
-  <div class="mcard portfolio-modal">
-    <div class="mhd">
-      <span class="mtitle">Portfolio Tracker</span>
-      <button class="mclose" id="pm-close">✕</button>
-    </div>
-    <div class="mbody">
-      <div class="pf-summary" id="pf-summary">
-        <div class="pf-stat"><span class="psl">Total Value</span><span class="psv" id="pf-val">—</span></div>
-        <div class="pf-stat"><span class="psl">Cost Basis</span><span class="psv" id="pf-cost">—</span></div>
-        <div class="pf-stat"><span class="psl">Unrealized P&amp;L</span><span class="psv" id="pf-pnl">—</span></div>
-        <div class="pf-stat"><span class="psl">Return</span><span class="psv" id="pf-ret">—</span></div>
-        <div class="pf-stat"><span class="psl">Positions</span><span class="psv" id="pf-pos">—</span></div>
-      </div>
-      <div id="pf-acct-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="acct-tab active" data-acct="all">All</button>
-        <button class="acct-tab" data-acct="T212 ISA">T212 ISA</button>
-        <button class="acct-tab" data-acct="eToro">eToro</button>
-        <button class="acct-tab" data-acct="T212 Invest">T212 Invest</button>
-        <button class="acct-tab" data-acct="IBKR">IBKR</button>
-      </div>
-      <div class="pf-tbl-wrap">
-        <table class="pf-tbl">
-          <thead><tr>
-            <th></th>
-            <th style="text-align:left">Ticker</th>
-            <th style="text-align:left">Account</th>
-            <th style="text-align:left">Name</th>
-            <th>Shares</th>
-            <th>Cost/sh</th>
-            <th>Price</th>
-            <th>Value</th>
-            <th>P&amp;L</th>
-            <th>%</th>
-            <th style="text-align:center">Action</th>
-          </tr></thead>
-          <tbody id="pf-tbody"></tbody>
-        </table>
-      </div>
-      <div class="pf-add-wrap">
-        <input class="fi pf-inp pf-add-sym" id="pf-add-sym" placeholder="Ticker" style="width:72px;text-transform:uppercase">
-        <input class="fi pf-inp" id="pf-add-sh" placeholder="Shares" type="number" min="0" step="0.001">
-        <input class="fi pf-inp" id="pf-add-cost" placeholder="Cost/sh" type="number" min="0" step="0.01">
-        <select class="fi pf-inp" id="pf-add-acct" style="font-family:var(--mono);font-size:12px">
-          <option value="T212 ISA">T212 ISA</option>
-          <option value="eToro">eToro</option>
-          <option value="T212 Invest">T212 Invest</option>
-          <option value="IBKR">IBKR</option>
-          <option value="Manual">Manual</option>
-        </select>
-        <button class="btn btn-p" id="pf-add-btn">Add Position</button>
-        <span style="flex:1"></span>
-        <button class="btn btn-s" id="pf-export-btn">⬇ Export CSV</button>
-      </div>
-    </div>
-    <div class="mft"><span class="msp"></span><button class="btn btn-s" id="pm-done">Done</button></div>
-  </div>
-</div>
 
 <!-- ALERTS MODAL -->
 <div class="overlay" id="alert-modal" hidden>
@@ -1164,14 +1064,12 @@ function init() {
   setupFilters();
   setupModals();
   setupRefresh();
-  seedPortfolioIfEmpty();
   _priceMeta = syncPriceMeta(S.stocks);
   renderResearchBanner();
   setupSheetsModal();
   setupExport();
   setupKeyboard();
   setupAlerts();
-  setupPortfolio();
   setupAnalytics();
   setupNewsDrawer();
   renderTabs();
@@ -2372,7 +2270,6 @@ function setupKeyboard() {
     const editable = tag === 'input' || tag === 'textarea' || tag === 'select' ||
       document.activeElement?.isContentEditable;
     const anyModal = !document.getElementById('analytics-modal').hidden ||
-      !document.getElementById('portfolio-modal').hidden ||
       !document.getElementById('alert-modal').hidden ||
       !document.getElementById('shortcuts-modal').hidden ||
       !document.getElementById('sheetsmodal').hidden;
@@ -2384,7 +2281,6 @@ function setupKeyboard() {
     if (e.key === 'Escape') {
       document.getElementById('shortcuts-modal').hidden = true;
       document.getElementById('analytics-modal').hidden = true;
-      document.getElementById('portfolio-modal').hidden = true;
       document.getElementById('alert-modal').hidden = true;
       closeNewsDrawer();
       kbClearRow();
@@ -2574,301 +2470,6 @@ function checkAlerts() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// PORTFOLIO TRACKER
-// ═══════════════════════════════════════════════════════════════════════════════
-function getPortfolio() { return ls.get('sig_portfolio') || []; }
-function savePortfolio(arr) { ls.set('sig_portfolio', arr); }
-
-function seedPortfolioIfEmpty() {
-  if (ls.get('sig_portfolio_seeded_v2')) return;
-  const existing = ls.get('sig_portfolio') || [];
-  if (existing.length > 0) { ls.set('sig_portfolio_seeded_v2', true); return; }
-  const seed = [
-    // ── ISA (Trading 212 ISA) ──────────────────────────────────────────
-    {sym:'HIMS', shares:612.45,   cost:31.96,     account:'T212 ISA', currency:'USD'},
-    {sym:'INOD', shares:260,      cost:47.71,     account:'T212 ISA', currency:'USD'},
-    {sym:'PGY',  shares:630,      cost:23.06,     account:'T212 ISA', currency:'USD'},
-    {sym:'BMNR', shares:541.55,   cost:33.69,     account:'T212 ISA', currency:'USD'},
-    {sym:'ROOT', shares:199.57,   cost:74.60,     account:'T212 ISA', currency:'USD'},
-    {sym:'CLS',  shares:36.38,    cost:234.16,    account:'T212 ISA', currency:'USD'},
-    {sym:'IREN', shares:269,      cost:35.44,     account:'T212 ISA', currency:'USD'},
-    {sym:'NOW',  shares:64.29,    cost:138.63,    account:'T212 ISA', currency:'USD'},
-    {sym:'META', shares:14.97,    cost:459.47,    account:'T212 ISA', currency:'USD'},
-    {sym:'GRAB', shares:2210,     cost:3.30,      account:'T212 ISA', currency:'USD'},
-    {sym:'NFLX', shares:73,       cost:69.27,     account:'T212 ISA', currency:'USD'},
-    {sym:'SYM',  shares:141.46,   cost:37.76,     account:'T212 ISA', currency:'USD'},
-    {sym:'AVGO', shares:15,       cost:281.84,    account:'T212 ISA', currency:'USD'},
-    {sym:'UPST', shares:185,      cost:43.39,     account:'T212 ISA', currency:'USD'},
-    {sym:'AKAM', shares:47.5,     cost:88.97,     account:'T212 ISA', currency:'USD'},
-    {sym:'OKLO', shares:122,      cost:42.40,     account:'T212 ISA', currency:'USD'},
-    {sym:'SMR',  shares:520,      cost:9.86,      account:'T212 ISA', currency:'USD'},
-    {sym:'FOUR', shares:100,      cost:58.12,     account:'T212 ISA', currency:'USD'},
-    {sym:'LUMN', shares:700,      cost:7.07,      account:'T212 ISA', currency:'USD'},
-    {sym:'BULL', shares:450,      cost:9.52,      account:'T212 ISA', currency:'USD'},
-    {sym:'NVDA', shares:19,       cost:153.14,    account:'T212 ISA', currency:'USD'},
-    {sym:'MU',   shares:4.39,     cost:675.13,    account:'T212 ISA', currency:'USD'},
-    {sym:'SOFI', shares:213.12,   cost:13.47,     account:'T212 ISA', currency:'USD'},
-    {sym:'ALAB', shares:12.5,     cost:221.87,    account:'T212 ISA', currency:'USD'},
-    {sym:'LEU',  shares:20,       cost:147.97,    account:'T212 ISA', currency:'USD'},
-    {sym:'CPRT', shares:99.96,    cost:25.90,     account:'T212 ISA', currency:'USD'},
-    {sym:'QCOM', shares:19,       cost:139.17,    account:'T212 ISA', currency:'USD'},
-    {sym:'RZLV', shares:1050,     cost:3.98,      account:'T212 ISA', currency:'USD'},
-    {sym:'COHR', shares:10.35,    cost:234.59,    account:'T212 ISA', currency:'USD'},
-    {sym:'TSM',  shares:6.5,      cost:307.98,    account:'T212 ISA', currency:'USD'},
-    {sym:'RKLB', shares:42,       cost:55.28,     account:'T212 ISA', currency:'USD'},
-    {sym:'SNPS', shares:6,        cost:363.59,    account:'T212 ISA', currency:'USD'},
-    {sym:'CRNT', shares:1200,     cost:3.43,      account:'T212 ISA', currency:'USD'},
-    {sym:'ANET', shares:13,       cost:153.65,    account:'T212 ISA', currency:'USD'},
-    {sym:'QS',   shares:440,      cost:6.31,      account:'T212 ISA', currency:'USD'},
-    {sym:'TTD',  shares:181.46,   cost:62.08,     account:'T212 ISA', currency:'USD'},
-    {sym:'BWXT', shares:16,       cost:139.02,    account:'T212 ISA', currency:'USD'},
-    {sym:'ONDS', shares:300,      cost:6.50,      account:'T212 ISA', currency:'USD'},
-    {sym:'AMKR', shares:47,       cost:38.30,     account:'T212 ISA', currency:'USD'},
-    {sym:'AMAT', shares:4.8,      cost:376.44,    account:'T212 ISA', currency:'USD'},
-    {sym:'APLD', shares:80,       cost:28.24,     account:'T212 ISA', currency:'USD'},
-    {sym:'CRDO', shares:8.34,     cost:173.96,    account:'T212 ISA', currency:'USD'},
-    {sym:'UBER', shares:23.94,    cost:56.99,     account:'T212 ISA', currency:'USD'},
-    {sym:'PRME', shares:500,      cost:3.58,      account:'T212 ISA', currency:'USD'},
-    {sym:'TOST', shares:50,       cost:29.77,     account:'T212 ISA', currency:'USD'},
-    {sym:'PYPL', shares:30,       cost:49.92,     account:'T212 ISA', currency:'USD'},
-    {sym:'HOOD', shares:15,       cost:66.26,     account:'T212 ISA', currency:'USD'},
-    {sym:'ASTS', shares:25,       cost:49.29,     account:'T212 ISA', currency:'USD'},
-    {sym:'TSSI', shares:150,      cost:8.48,      account:'T212 ISA', currency:'USD'},
-    {sym:'PINS', shares:50,       cost:25.07,     account:'T212 ISA', currency:'USD'},
-    {sym:'MSTR', shares:7,        cost:207.47,    account:'T212 ISA', currency:'USD'},
-    {sym:'RBLX', shares:16,       cost:83.61,     account:'T212 ISA', currency:'USD'},
-    {sym:'AIIO', shares:110,      cost:24.19,     account:'T212 ISA', currency:'USD'},
-    {sym:'AMZN', shares:7.6,      cost:208.54,    account:'T212 ISA', currency:'USD'},  // NEW Sep 6
-    // ── Portfolio 2 (eToro) ────────────────────────────────────────────
-    {sym:'OABI', shares:59.99271, cost:5.49,      account:'eToro',  currency:'USD'},
-    {sym:'ROOT', shares:40,       cost:82.485,    account:'eToro',  currency:'USD'},
-    {sym:'PYPL', shares:63.51626, cost:78.72,     account:'eToro',  currency:'USD'},
-    {sym:'DUOL', shares:13.28364, cost:376.40272, account:'eToro',  currency:'USD'},
-    {sym:'SMCI', shares:2.80046,  cost:99.098,    account:'eToro',  currency:'USD'},
-    // ── Portfolio 3 (T212 Invest) ──────────────────────────────────────
-    {sym:'ROOT', shares:35,       cost:65.29,     account:'T212 Invest',  currency:'USD'},
-    {sym:'HIMS', shares:45.50,    cost:32.35,     account:'T212 Invest',  currency:'USD'},
-    {sym:'BMNR', shares:40,       cost:30.64,     account:'T212 Invest',  currency:'USD'},
-    {sym:'EL',   shares:7.17,     cost:97.51,     account:'T212 Invest',  currency:'USD'},
-    // ── Portfolio 4 (IBKR) ────────────────────────────────────────────
-    {sym:'BMNR', shares:38,       cost:46.36,     account:'IBKR',  currency:'USD'},
-    {sym:'HIMS', shares:30,       cost:44.68,     account:'IBKR',  currency:'USD'},
-  ];
-  ls.set('sig_portfolio', seed);
-  ls.set('sig_portfolio_seeded_v2', true);
-}
-
-function setupPortfolio() {
-  document.getElementById('portfolio-btn').addEventListener('click', openPortfolio);
-  document.getElementById('pm-close').addEventListener('click', () => document.getElementById('portfolio-modal').hidden=true);
-  document.getElementById('pm-done').addEventListener('click', () => document.getElementById('portfolio-modal').hidden=true);
-  document.getElementById('pf-add-btn').addEventListener('click', addPosition);
-  document.getElementById('pf-export-btn').addEventListener('click', exportPortfolio);
-}
-
-function clearSuggestionCache() {
-  // Re-derive suggestions from rating if they were set to the generic HOLD default
-  // (distinguishable from analysis-set HOLDs by checking if sym is in the map)
-  if (ls.get('sig_sug_migrated_v2')) return;
-  const pf = getPortfolio();
-  pf.forEach(p => { if (p.suggestion && !_PORTFOLIO_SUGGESTIONS[p.sym]) delete p.suggestion; });
-  savePortfolio(pf);
-  ls.set('sig_sug_migrated_v2', true);
-}
-
-function migrateAccountNames() {
-  // Normalise old underscore/abbreviated account names to current labels
-  const MAP = {'T212_ISA':'T212 ISA','T212_Inv':'T212 Invest','T212 ISA':'T212 ISA','T212 Invest':'T212 Invest','eToro':'eToro','IBKR':'IBKR'};
-  const pf = getPortfolio();
-  let changed = false;
-  pf.forEach(p => {
-    if (p.account && MAP[p.account] && MAP[p.account] !== p.account) {
-      p.account = MAP[p.account]; changed = true;
-    }
-  });
-  if (changed) savePortfolio(pf);
-}
-
-function openPortfolio() {
-  migrateAccountNames();
-  clearSuggestionCache();
-  applySuggestionDefaults();
-  renderPortfolio();
-  document.getElementById('portfolio-modal').hidden = false;
-}
-
-function addPosition() {
-  const sym = document.getElementById('pf-add-sym').value.trim().toUpperCase();
-  const shares = parseFloat(document.getElementById('pf-add-sh').value);
-  const cost = parseFloat(document.getElementById('pf-add-cost').value);
-  const account = document.getElementById('pf-add-acct')?.value || 'Manual';
-  if (!sym || isNaN(shares) || isNaN(cost)) { showToast('Enter ticker, shares, and cost', true); return; }
-  const pf = getPortfolio();
-  pf.push({sym, shares, cost, account, currency:'USD'});
-  savePortfolio(pf);
-  document.getElementById('pf-add-sym').value='';
-  document.getElementById('pf-add-sh').value='';
-  document.getElementById('pf-add-cost').value='';
-  renderPortfolio();
-  showToast(`Position added: ${sym}`);
-}
-
-let _pfAcctFilter='all';
-function renderPortfolio() {
-  const pf = getPortfolio();
-  const tbody = document.getElementById('pf-tbody');
-  // account tab filter
-  document.querySelectorAll('#pf-acct-tabs .acct-tab').forEach(btn=>{
-    btn.classList.toggle('active', btn.dataset.acct===_pfAcctFilter);
-    btn.onclick = ()=>{_pfAcctFilter=btn.dataset.acct; renderPortfolio();};
-  });
-  const shown = _pfAcctFilter==='all' ? pf : pf.filter(p=>p.account===_pfAcctFilter);
-  let totalVal=0, totalCost=0;
-  const ACCT_COL = {'T212 ISA':'#00BAA0','eToro':'#1E8BC3','T212 Invest':'#5B8DD9','IBKR':'#D4813A'};
-  tbody.innerHTML = shown.length ? shown.map((p,i) => {
-    const realIdx = pf.indexOf(p);
-    const stk = S.stocks.find(s => s.sym === p.sym);
-    const price = stk ? parseFloat(stk.price)||0 : 0;
-    const val = price * p.shares;
-    const basis = p.cost * p.shares;
-    const pnl = val - basis;
-    const pct = basis ? (pnl/basis*100) : 0;
-    totalVal += val; totalCost += basis;
-    const pc = pnl >= 0 ? 'pos' : 'neg';
-    const ps = pnl >= 0 ? '+' : '';
-    const fmt2 = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const acct = p.account||'—';
-    const ac = ACCT_COL[p.account]||'var(--text3)';
-    return `<tr>
-      <td style="text-align:center;padding:2px 4px"><button class="pf-del" onclick="deletePosition(${realIdx})">✕</button></td>
-      <td>${p.sym}</td>
-      <td><span style="font-size:10px;background:${ac}22;color:${ac};padding:1px 5px;border-radius:8px">${acct}</span></td>
-      <td>${stk?.name||p.sym}</td>
-      <td><input class="pf-inp" type="number" step="0.001" value="${p.shares}"
-        onchange="updatePosition(${realIdx},'shares',this.value)"></td>
-      <td><input class="pf-inp" type="number" step="0.01" value="${p.cost}"
-        onchange="updatePosition(${realIdx},'cost',this.value)"></td>
-      <td>${price?'$'+fmt2(price):'—'}</td>
-      <td>${val?'$'+fmt2(val):'—'}</td>
-      <td class="${pc}">${val?ps+'$'+fmt2(pnl):'—'}</td>
-      <td class="${pc}">${val?ps+pct.toFixed(2)+'%':'—'}</td>
-      <td style="text-align:center">${renderSugCell(p, realIdx)}</td>
-    </tr>`;
-  }).join('') : `<tr><td colspan="11" style="text-align:center;padding:16px;color:var(--text3)">${pf.length?'No positions for this account.':'No positions yet.'}</td></tr>`;
-  const totalPnl = totalVal - totalCost;
-  const totalRet = totalCost ? (totalPnl/totalCost*100) : 0;
-  const fmt = n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const sign = n => n>=0?'+':'';
-  const pc = n => n>=0?'pos':'neg';
-  document.getElementById('pf-val').textContent = fmt(totalVal);
-  document.getElementById('pf-cost').textContent = fmt(totalCost);
-  const pnlEl = document.getElementById('pf-pnl');
-  pnlEl.textContent = sign(totalPnl)+fmt(totalPnl);
-  pnlEl.className = 'psv ' + pc(totalPnl);
-  const retEl = document.getElementById('pf-ret');
-  retEl.textContent = sign(totalRet)+totalRet.toFixed(2)+'%';
-  retEl.className = 'psv ' + pc(totalRet);
-  document.getElementById('pf-pos').textContent = pf.length;
-  // end renderPortfolio
-}
-
-
-const _PORTFOLIO_SUGGESTIONS = {
-  // SELL
-  TTD:'SELL',AIIO:'SELL',RZLV:'SELL',CRNT:'SELL',RBLX:'SELL',
-  MSTR:'SELL',LUMN:'SELL',OKLO:'SELL',SMR:'SELL',BULL:'SELL',
-  GRAB:'SELL',TSSI:'SELL',PRME:'SELL',ONDS:'SELL',QS:'SELL',
-  PINS:'SELL',ASTS:'SELL',
-  // REDUCE
-  PGY:'REDUCE',BMNR:'REDUCE',ROOT:'REDUCE',HIMS:'REDUCE',
-  INOD:'REDUCE',UPST:'REDUCE',FOUR:'REDUCE',SOFI:'REDUCE',
-  // ADD ON DIP
-  NVDA:'ADD ON DIP',MU:'ADD ON DIP',NOW:'ADD ON DIP',AMZN:'ADD ON DIP',
-  // HOLD
-  META:'HOLD',AVGO:'HOLD',TSM:'HOLD',CLS:'HOLD',ANET:'HOLD',
-  COHR:'HOLD',CRDO:'HOLD',BWXT:'HOLD',IREN:'HOLD',NFLX:'HOLD',
-  QCOM:'HOLD',SNPS:'HOLD',AMAT:'HOLD',CPRT:'HOLD',AKAM:'HOLD',
-};
-const _SUG_CYCLE = ['SELL','REDUCE','HOLD','ADD ON DIP'];
-
-function applySuggestionDefaults() {
-  const pf = getPortfolio();
-  let changed = false;
-  pf.forEach(p => {
-    if (!p.suggestion) {
-      if (_PORTFOLIO_SUGGESTIONS[p.sym]) {
-        // Explicit override from analysis takes priority
-        p.suggestion = _PORTFOLIO_SUGGESTIONS[p.sym];
-      } else {
-        // Derive from tracker rating: MO→ADD ON DIP, GO/MW→HOLD, else HOLD
-        const stk = S.stocks.find(s => s.sym === p.sym);
-        const rating = stk?.rating || '';
-        p.suggestion = rating === 'MO' ? 'ADD ON DIP' : 'HOLD';
-      }
-      changed = true;
-    }
-  });
-  if (changed) savePortfolio(pf);
-}
-
-function renderSugCell(p, idx) {
-  const sug = p.suggestion || '';
-  const cls = sug ? 'sug-' + sug.replace(' ON DIP','').replace(' ','') : '';
-  const label = sug || '—';
-  const opts = _SUG_CYCLE.map(s => `<option value="${s}"${sug===s?' selected':''}>${s}</option>`).join('');
-  return `<span class="sug-pill ${cls}" title="Click to change" onclick="cycleSuggestion(${idx},this)">${label}</span>
-    <select class="sug-edit" onchange="setSuggestion(${idx},this.value,this)">${opts}<option value="">— clear —</option></select>`;
-}
-
-function cycleSuggestion(idx, el) {
-  // Show the select instead of cycling
-  const sel = el.nextElementSibling;
-  el.style.display = 'none';
-  sel.style.display = 'inline-block';
-  sel.focus();
-  sel.onblur = () => { sel.style.display='none'; el.style.display=''; };
-}
-
-function setSuggestion(idx, val, selEl) {
-  const pf = getPortfolio();
-  if (!pf[idx]) return;
-  pf[idx].suggestion = val;
-  savePortfolio(pf);
-  renderPortfolio();
-}
-
-function updatePosition(i, key, val) {
-  const pf = getPortfolio();
-  if (!pf[i]) return;
-  pf[i][key] = parseFloat(val)||0;
-  savePortfolio(pf);
-  renderPortfolio();
-}
-function deletePosition(i) {
-  const pf = getPortfolio(); pf.splice(i,1); savePortfolio(pf);
-  renderPortfolio(); showToast('Position removed');
-}
-
-function exportPortfolio() {
-  const pf = getPortfolio();
-  const header = 'Ticker,Account,Name,Shares,Cost/sh,Price,Value,P&L,Return%';
-  const rows = pf.map(p => {
-    const stk = S.stocks.find(s => s.sym === p.sym);
-    const price = stk ? parseFloat(stk.price)||0 : 0;
-    const val = price * p.shares;
-    const basis = p.cost * p.shares;
-    const pnl = val - basis;
-    const pct = basis ? (pnl/basis*100).toFixed(2) : '';
-    return [p.sym, p.account||'', stk?.name||'', p.shares, p.cost, price||'', val||'', pnl||'', pct].map(v=>JSON.stringify(String(v))).join(',');
-  });
-  const csv = [header,...rows].join('\n');
-  const blob = new Blob([csv],{type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'portfolio.csv';
-  a.click();
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ANALYTICS PANEL
