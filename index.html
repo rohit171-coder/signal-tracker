@@ -307,12 +307,6 @@ td.na{color:var(--text3);font-size:11px}
 .pc-stale{opacity:.55}
 .pc-stale-dot{display:inline-block;width:5px;height:5px;border-radius:50%;
   background:var(--text3);margin-left:3px;vertical-align:middle;cursor:default}
-.research-due-banner{
-  display:flex;align-items:center;gap:8px;padding:6px 16px;
-  background:rgba(251,191,36,.12);border-bottom:1px solid rgba(251,191,36,.3);
-  font-size:11px;color:#fbbf24;cursor:pointer;
-}
-.research-due-banner:hover{background:rgba(251,191,36,.2)}
 
 /* Prominent scrollbars — all browsers */
 *{scrollbar-width:thin;scrollbar-color:var(--text3) var(--surf2)}
@@ -1083,7 +1077,6 @@ function init() {
   setupModals();
   setupRefresh();
   _priceMeta = syncPriceMeta(S.stocks);
-  renderResearchBanner();
   setupSheetsModal();
   setupExport();
   setupKeyboard();
@@ -1536,37 +1529,6 @@ function fmt(v) {
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-function renderResearchBanner() {
-  // Show a banner if any rated stock hasn't been researched in 60+ days
-  const now = Date.now();
-  const staleCount = Object.values(_priceMeta).filter(m => {
-    const tgtAge = m.tgt ? (now - m.tgt.ts) : Infinity;
-    const entAge = m.entry ? (now - m.entry.ts) : Infinity;
-    return Math.min(tgtAge, entAge) > DAYS_60;
-  }).length;
-  const totalRated = S.stocks.filter(s=>['MO','GO','MW'].includes(s.rating)).length;
-
-  let banner = document.getElementById('research-banner');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'research-banner';
-    const filterBar = document.querySelector('.filter-bar');
-    if (filterBar) filterBar.parentNode.insertBefore(banner, filterBar.nextSibling);
-  }
-  if (staleCount > 0) {
-    banner.className = 'research-due-banner';
-    banner.innerHTML = `⚠ <strong>${staleCount} stock${staleCount>1?'s':''}</strong> of ${totalRated} rated stocks have price targets older than 60 days — monthly research due. Click to filter rated stocks.`;
-    banner.hidden = false;
-    banner.onclick = () => {
-      // Filter to rated stocks only
-      document.querySelectorAll('[data-rat]').forEach(b => b.classList.remove('on'));
-      const btn = document.querySelector('[data-rat="MO"]');
-      if (btn) { btn.click(); }
-    };
-  } else {
-    banner.hidden = true;
-  }
-}
 
 function renderSummary() {
   const f=S.filtered;
